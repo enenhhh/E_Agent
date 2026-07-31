@@ -263,7 +263,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.component }}
 
       - name: Attest container provenance
-        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
         with:
           subject-name: ghcr.io/${{ github.repository_owner }}/e-agent-${{ matrix.component }}
           subject-digest: ${{ steps.build.outputs.digest }}
@@ -331,7 +331,7 @@ jobs:
         run: cosign sign-blob --yes --bundle artifacts/SHA256SUMS.sigstore.json artifacts/SHA256SUMS
 
       - name: Attest release artifacts
-        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
         with:
           subject-path: artifacts/**
 

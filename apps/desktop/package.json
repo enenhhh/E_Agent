@@ -1,0 +1,161 @@
+{
+  "name": "@e-agent/desktop",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main.js",
+  "description": "E Agent 安全 Electron 桌面壳",
+  "author": "E Agent Contributors",
+  "scripts": {
+    "dev": "pnpm prepare:native && concurrently -k \"vite --host 127.0.0.1\" \"pnpm build:main -- --watch\" \"wait-on tcp:5173 dist/main.js dist/preload.cjs && cross-env E_AGENT_RENDERER_URL=http://127.0.0.1:5173 electron .\"",
+    "start": "pnpm prepare:native && electron .",
+    "build": "pnpm build:renderer && pnpm build:main",
+    "build:renderer": "vite build",
+    "build:main": "tsup --config tsup.config.ts",
+    "prepare:native": "node ../../scripts/build/prepare-electron-native.mjs",
+    "package": "node ../../scripts/build/package-desktop.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@e-agent/app-ui": "workspace:*",
+    "@e-agent/contracts": "workspace:*",
+    "@e-agent/core": "workspace:*",
+    "@e-agent/database": "workspace:*",
+    "@e-agent/mcp-runtime": "workspace:*",
+    "@e-agent/plugin-runtime": "workspace:*",
+    "@e-agent/plugin-sdk": "workspace:*",
+    "@e-agent/security": "workspace:*",
+    "@e-agent/skills": "workspace:*",
+    "better-sqlite3": "12.10.0",
+    "electron-updater": "6.8.9",
+    "ipaddr.js": "2.4.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "undici": "7.28.0",
+    "zod": "4.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "concurrently": "9.2.1",
+    "cross-env": "10.1.0",
+    "electron": "41.0.2",
+    "electron-builder": "26.8.1",
+    "tsup": "8.5.1",
+    "typescript": "5.9.2",
+    "vite": "8.1.5",
+    "vitest": "4.1.10",
+    "wait-on": "9.0.4"
+  },
+  "build": {
+    "appId": "com.eagent.desktop",
+    "productName": "E Agent",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**"
+    ],
+    "files": [
+      "dist/**",
+      "package.json",
+      "!dist/**/*.map",
+      "!node_modules/**/coverage/**",
+      "!node_modules/**/.turbo/**",
+      "!node_modules/**/test/**",
+      "!node_modules/**/tests/**",
+      "!node_modules/**/__tests__/**",
+      "!node_modules/**/*.test.*",
+      "!node_modules/**/*.spec.*",
+      "!node_modules/**/*.map",
+      "!node_modules/**/*.log",
+      "!node_modules/**/*.tsbuildinfo",
+      "!node_modules/@e-agent/**/src/**",
+      "!node_modules/@e-agent/**/tsconfig*.json",
+      "!node_modules/@e-agent/**/vitest.config.*"
+    ],
+    "extraResources": [
+      {
+        "from": "../plugin-host/dist",
+        "to": "plugin-host",
+        "filter": [
+          "**/*.js"
+        ]
+      },
+      {
+        "from": "../../plugins/code-review",
+        "to": "built-in-plugins/code-review",
+        "filter": [
+          "dist/**/*.js",
+          "manifest.json",
+          "skill.json",
+          "prompts/**/*",
+          "README.md"
+        ]
+      },
+      {
+        "from": "../../plugins/builtin-skills",
+        "to": "built-in-plugins/builtin-skills",
+        "filter": [
+          "dist/**/*.js",
+          "manifest.json",
+          "skills/**/*",
+          "README.md"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "../../release",
+      "buildResources": "build"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "selectPerMachineByDefault": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "removeDefaultUninstallWelcomePage": false,
+      "include": "build/installer.nsh",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeader": "build/installer-header.bmp",
+      "installerSidebar": "build/installer-sidebar.bmp",
+      "uninstallerSidebar": "build/uninstaller-sidebar.bmp",
+      "uninstallDisplayName": "${productName} ${version}",
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}",
+      "displayLanguageSelector": true,
+      "installerLanguages": [
+        "en_US",
+        "zh_CN"
+      ],
+      "warningsAsErrors": true
+    },
+    "mac": {
+      "icon": "build/icon.icns",
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "notarize": true,
+      "gatekeeperAssess": false
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development"
+    }
+  }
+}

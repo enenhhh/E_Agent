@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.test-gen",
+  "command": "@test-gen",
+  "name": {
+    "zh-CN": "测试生成",
+    "en-US": "Test Generator"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "识别项目测试框架，并为源码生成覆盖正常、边界和失败路径的可运行单元测试。",
+    "en-US": "Detect the project's test framework and generate runnable unit tests covering happy, boundary, and failure paths."
+  },
+  "prompts": {
+    "zh-CN": "prompts/test-gen.zh-CN.md",
+    "en-US": "prompts/test-gen.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.test-gen"
+  },
+  "variables": [
+    {
+      "name": "code",
+      "description": "被测试的完整源码",
+      "required": true,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "language",
+      "description": "编程语言",
+      "required": false,
+      "maximumLength": 64
+    },
+    {
+      "name": "filePath",
+      "description": "源码文件路径",
+      "required": false,
+      "maximumLength": 1024
+    },
+    {
+      "name": "projectContext",
+      "description": "依赖清单、测试配置和相关类型",
+      "required": false,
+      "maximumLength": 100000
+    },
+    {
+      "name": "testFramework",
+      "description": "指定测试框架；留空或 auto 时自动识别",
+      "required": false,
+      "maximumLength": 64
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 120000
+}

@@ -1,0 +1,16 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'plugins/*'
+
+allowBuilds:
+  better-sqlite3: true
+  electron: true
+  electron-winstaller: true
+  esbuild: true
+  simple-git-hooks: true
+
+onlyBuiltDependencies:
+  - better-sqlite3
+  - electron
+  - esbuild

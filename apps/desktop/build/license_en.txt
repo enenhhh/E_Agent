@@ -1,0 +1,43 @@
+﻿E Agent 0.1.2 Terms and Risk Notice
+===============================================================================
+
+Read this notice in full before installing or using E Agent. Selecting
+“I have read, understood and accept” confirms that you understand and accept
+these risks, responsibilities, and data-handling choices.
+
+1. Human review is required
+-------------------------------------------------------------------------------
+AI-generated code, explanations, tests, commands, and recommendations may be
+inaccurate, incomplete, or insecure. Independently review and verify all output
+before merging, executing, or deploying it. E Agent does not provide legal,
+medical, financial, or other professional advice.
+
+2. File, command, and browser tools
+-------------------------------------------------------------------------------
+Approved tools may read files, propose file changes, access networks, or execute
+commands. Verify every tool name, argument, working directory, and diff, and keep
+recoverable backups before working with important projects or data. You are
+responsible for approved actions and their results.
+
+3. Third-party models, data, and charges
+-------------------------------------------------------------------------------
+Prompts, context, file excerpts, and tool results sent to model providers are
+governed by those providers’ terms and privacy policies. Do not submit personal,
+secret, or confidential data that you are not authorized to process. You are
+responsible for API charges, quotas, and proxy or network risks.
+
+4. Credentials and local data
+-------------------------------------------------------------------------------
+E Agent encrypts stored API keys according to its configuration, but you must
+still use least-privilege credentials, rotate them, and secure the device. A
+normal uninstall keeps local conversations, settings, plugins, and encrypted
+credentials by default. The uninstaller lets you explicitly choose permanent
+removal; back up required data first because E Agent cannot restore deleted data.
+
+5. Disclaimer
+-------------------------------------------------------------------------------
+To the maximum extent permitted by applicable law, the software is provided
+“as is,” without a promise of uninterrupted operation, freedom from defects,
+fitness for a particular purpose, or correctness of generated results. The
+repository license and third-party notices remain applicable and are not
+replaced by this notice.

@@ -1,0 +1,1410 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "E Agent API",
+    "version": "1.0.0",
+    "description": "E Agent self-hosted collaboration server API. Streaming chat responses use Server-Sent Events."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:4318",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    { "name": "Health" },
+    { "name": "Authentication" },
+    { "name": "Members" },
+    { "name": "Providers" },
+    { "name": "Keys" },
+    { "name": "Models" },
+    { "name": "Conversations" },
+    { "name": "Chat" },
+    { "name": "Settings" },
+    { "name": "Usage" }
+  ],
+  "paths": {
+    "/health/live": {
+      "get": {
+        "operationId": "getLiveness",
+        "tags": ["Health"],
+        "responses": {
+          "200": {
+            "description": "The process is alive.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "getReadiness",
+        "tags": ["Health"],
+        "responses": {
+          "200": {
+            "description": "All mandatory dependencies are ready.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Health" }
+              }
+            }
+          },
+          "503": {
+            "description": "A mandatory dependency is unavailable.",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/status": {
+      "get": {
+        "operationId": "getAuthenticationStatus",
+        "tags": ["Authentication"],
+        "responses": {
+          "200": {
+            "description": "Public initialization status. A required bootstrap token is never returned.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthStatus" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "registerUser",
+        "tags": ["Authentication"],
+        "parameters": [
+          {
+            "name": "X-E-Agent-Bootstrap-Token",
+            "in": "header",
+            "required": false,
+            "description": "Required only for the first Owner registration on a production Server.",
+            "schema": { "type": "string", "minLength": 32, "writeOnly": true }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthSession" }
+              }
+            }
+          },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "loginUser",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthSession" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logoutUser",
+        "tags": ["Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Client logout was acknowledged and session lifecycle hooks were notified. Bearer tokens remain stateless until expiry."
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "getCurrentUser",
+        "tags": ["Authentication"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current user.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "listUsers",
+        "tags": ["Members"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Team members visible to Owner and Admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "post": {
+        "operationId": "createUser",
+        "tags": ["Members"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MemberInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Team member created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/api/v1/users/{userId}": {
+      "parameters": [{ "$ref": "#/components/parameters/UserId" }],
+      "patch": {
+        "operationId": "updateUser",
+        "tags": ["Members"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MemberPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Team member updated.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteUser",
+        "tags": ["Members"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Team member deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/providers": {
+      "get": {
+        "operationId": "listProviders",
+        "tags": ["Providers"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Configured providers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Provider" }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "post": {
+        "operationId": "createProvider",
+        "tags": ["Providers"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProviderInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Provider created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Provider" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/api/v1/providers/{providerId}": {
+      "parameters": [{ "$ref": "#/components/parameters/ProviderId" }],
+      "patch": {
+        "operationId": "updateProvider",
+        "tags": ["Providers"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProviderPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Provider updated.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Provider" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/keys": {
+      "get": {
+        "operationId": "listApiKeys",
+        "tags": ["Keys"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "API key metadata. Secret values are never returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ApiKey" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createApiKey",
+        "tags": ["Keys"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApiKeyInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Encrypted API key stored.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKey" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/api/v1/keys/{keyId}": {
+      "parameters": [{ "$ref": "#/components/parameters/KeyId" }],
+      "patch": {
+        "operationId": "updateApiKey",
+        "tags": ["Keys"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApiKeyPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "API key metadata updated.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKey" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteApiKey",
+        "tags": ["Keys"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "API key removed." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/keys/{keyId}/check": {
+      "parameters": [{ "$ref": "#/components/parameters/KeyId" }],
+      "post": {
+        "operationId": "checkApiKeyHealth",
+        "tags": ["Keys"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Latest key health.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/KeyHealth" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/models": {
+      "get": {
+        "operationId": "listModels",
+        "tags": ["Models"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "providerId",
+            "in": "query",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cached model catalog.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Model" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/models/discover": {
+      "post": {
+        "operationId": "discoverModels",
+        "tags": ["Models"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "providerId": { "type": "string", "format": "uuid" },
+                  "force": { "type": "boolean", "default": false }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Discovered models.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Model" }
+                }
+              }
+            }
+          },
+          "502": { "$ref": "#/components/responses/UpstreamError" }
+        }
+      }
+    },
+    "/api/v1/conversations": {
+      "get": {
+        "operationId": "listConversations",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation summaries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Conversation" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createConversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ConversationInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conversation created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Conversation" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversationId}": {
+      "parameters": [{ "$ref": "#/components/parameters/ConversationId" }],
+      "get": {
+        "operationId": "getConversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Conversation with messages.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ConversationDetail" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "patch": {
+        "operationId": "updateConversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ConversationPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Conversation updated.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Conversation" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteConversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Conversation deleted." },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversationId}/branch": {
+      "parameters": [{ "$ref": "#/components/parameters/ConversationId" }],
+      "post": {
+        "operationId": "branchConversation",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["messageId"],
+                "properties": {
+                  "messageId": { "type": "string", "format": "uuid" },
+                  "title": { "type": "string", "maxLength": 200 }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Branch created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Conversation" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversationId}/snapshots": {
+      "parameters": [{ "$ref": "#/components/parameters/ConversationId" }],
+      "get": {
+        "operationId": "listConversationSnapshots",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Available snapshots.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Snapshot" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createConversationSnapshot",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "201": {
+            "description": "Snapshot created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Snapshot" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversationId}/snapshots/{snapshotId}/restore": {
+      "parameters": [
+        { "$ref": "#/components/parameters/ConversationId" },
+        {
+          "name": "snapshotId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "post": {
+        "operationId": "restoreConversationSnapshot",
+        "tags": ["Conversations"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Snapshot restored as the current conversation state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationDetail"
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        }
+      }
+    },
+    "/api/v1/chat/completions": {
+      "post": {
+        "operationId": "createChatCompletion",
+        "tags": ["Chat"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChatRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SSE frames. Each data payload is a ChatStreamEvent JSON value; the terminal frame uses event: done.",
+            "headers": {
+              "Cache-Control": {
+                "schema": { "type": "string", "const": "no-cache" }
+              },
+              "X-Request-Id": {
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "contentMediaType": "text/event-stream"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "502": { "$ref": "#/components/responses/UpstreamError" }
+        }
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "operationId": "getSettings",
+        "tags": ["Settings"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Effective user settings.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Settings" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateSettings",
+        "tags": ["Settings"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SettingsPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated settings.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Settings" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usage/records": {
+      "get": {
+        "operationId": "listUsageRecords",
+        "tags": ["Usage"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/From" },
+          { "$ref": "#/components/parameters/To" },
+          {
+            "name": "model",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raw usage records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/UsageRecord" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usage/summary": {
+      "get": {
+        "operationId": "getUsageSummary",
+        "tags": ["Usage"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/From" },
+          { "$ref": "#/components/parameters/To" },
+          {
+            "name": "groupBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["day", "week", "month", "model", "project", "user"],
+              "default": "day"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregated usage.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UsageSummary" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/usage/export": {
+      "get": {
+        "operationId": "exportUsage",
+        "tags": ["Usage"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/From" },
+          { "$ref": "#/components/parameters/To" },
+          {
+            "name": "format",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["csv", "json", "pdf"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage report.",
+            "content": {
+              "text/csv": { "schema": { "type": "string" } },
+              "application/json": { "schema": { "type": "object" } },
+              "application/pdf": {
+                "schema": { "type": "string", "contentEncoding": "base64" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "parameters": {
+      "ProviderId": {
+        "name": "providerId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "KeyId": {
+        "name": "keyId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "ConversationId": {
+        "name": "conversationId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "UserId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "From": {
+        "name": "from",
+        "in": "query",
+        "schema": { "type": "string", "format": "date-time" }
+      },
+      "To": {
+        "name": "to",
+        "in": "query",
+        "schema": { "type": "string", "format": "date-time" }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication is missing or invalid.",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "The authenticated identity or bootstrap proof is not allowed to perform this operation.",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found.",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Resource already exists or has changed.",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Request validation failed.",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Request rate or configured quota exceeded.",
+        "headers": {
+          "Retry-After": { "schema": { "type": "integer", "minimum": 1 } }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      },
+      "UpstreamError": {
+        "description": "The selected model provider failed.",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "required": ["status", "timestamp"],
+        "properties": {
+          "status": { "type": "string", "enum": ["ok", "alive", "ready"] },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "checks": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthStatus": {
+        "type": "object",
+        "required": ["initialized", "bootstrapTokenRequired"],
+        "properties": {
+          "initialized": { "type": "boolean" },
+          "bootstrapTokenRequired": {
+            "type": "boolean",
+            "description": "True only while a production Server still requires the one-time deployment token for its first Owner."
+          }
+        },
+        "additionalProperties": false
+      },
+      "Problem": {
+        "type": "object",
+        "required": ["type", "title", "status", "requestId"],
+        "properties": {
+          "type": { "type": "string", "format": "uri-reference" },
+          "title": { "type": "string" },
+          "status": { "type": "integer", "minimum": 400, "maximum": 599 },
+          "detail": { "type": "string" },
+          "code": { "type": "string" },
+          "requestId": { "type": "string" },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "message"],
+              "properties": {
+                "path": { "type": "string" },
+                "message": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Role": {
+        "type": "string",
+        "enum": ["owner", "admin", "member", "viewer"]
+      },
+      "User": {
+        "type": "object",
+        "required": ["id", "email", "displayName", "role", "active", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "displayName": { "type": "string" },
+          "role": { "$ref": "#/components/schemas/Role" },
+          "active": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "MemberInput": {
+        "type": "object",
+        "required": ["email", "password", "displayName", "role"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8, "maxLength": 256 },
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "role": { "type": "string", "enum": ["admin", "member", "viewer"] }
+        },
+        "additionalProperties": false
+      },
+      "MemberPatch": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "role": { "type": "string", "enum": ["admin", "member", "viewer"] },
+          "active": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["email", "password", "displayName"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 12, "maxLength": 128 },
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 80 }
+        },
+        "additionalProperties": false
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 1, "maxLength": 128 }
+        },
+        "additionalProperties": false
+      },
+      "AuthSession": {
+        "type": "object",
+        "required": ["accessToken", "expiresAt", "user"],
+        "properties": {
+          "accessToken": { "type": "string" },
+          "expiresAt": { "type": "string", "format": "date-time" },
+          "user": { "$ref": "#/components/schemas/User" }
+        },
+        "additionalProperties": false
+      },
+      "Provider": {
+        "type": "object",
+        "required": ["id", "name", "kind", "baseUrl", "enabled"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "enum": ["openai", "anthropic", "deepseek", "groq", "google", "ollama", "custom"]
+          },
+          "baseUrl": { "type": "string", "format": "uri" },
+          "enabled": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "ProviderInput": {
+        "type": "object",
+        "required": ["name", "kind", "baseUrl"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "kind": {
+            "type": "string",
+            "enum": ["openai", "anthropic", "deepseek", "groq", "google", "ollama", "custom"]
+          },
+          "baseUrl": { "type": "string", "format": "uri" },
+          "enabled": { "type": "boolean", "default": true }
+        },
+        "additionalProperties": false
+      },
+      "ProviderPatch": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "baseUrl": { "type": "string", "format": "uri" },
+          "enabled": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "KeyHealth": {
+        "type": "object",
+        "required": ["status", "checkedAt"],
+        "properties": {
+          "status": { "type": "string", "enum": ["green", "yellow", "red", "unknown"] },
+          "checkedAt": { "type": "string", "format": "date-time" },
+          "remainingPercent": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+          "message": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "ApiKey": {
+        "type": "object",
+        "required": ["id", "providerId", "label", "maskedValue", "enabled", "priority", "health"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "providerId": { "type": "string", "format": "uuid" },
+          "label": { "type": "string" },
+          "maskedValue": { "type": "string", "description": "Irreversible display mask only." },
+          "enabled": { "type": "boolean" },
+          "priority": { "type": "integer", "minimum": 0 },
+          "proxyUrlConfigured": { "type": "boolean" },
+          "dailyTokenLimit": { "type": ["integer", "null"], "minimum": 0 },
+          "monthlyTokenLimit": { "type": ["integer", "null"], "minimum": 0 },
+          "dailyCostLimitUsd": { "type": ["number", "null"], "minimum": 0 },
+          "monthlyCostLimitUsd": { "type": ["number", "null"], "minimum": 0 },
+          "health": { "$ref": "#/components/schemas/KeyHealth" }
+        },
+        "additionalProperties": false
+      },
+      "ApiKeyInput": {
+        "type": "object",
+        "required": ["providerId", "label", "secret"],
+        "properties": {
+          "providerId": { "type": "string", "format": "uuid" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "secret": { "type": "string", "minLength": 8, "writeOnly": true },
+          "priority": { "type": "integer", "minimum": 0, "default": 0 },
+          "proxyUrl": { "type": "string", "format": "uri", "writeOnly": true },
+          "dailyTokenLimit": { "type": "integer", "minimum": 0 },
+          "monthlyTokenLimit": { "type": "integer", "minimum": 0 },
+          "dailyCostLimitUsd": { "type": "number", "minimum": 0 },
+          "monthlyCostLimitUsd": { "type": "number", "minimum": 0 }
+        },
+        "additionalProperties": false
+      },
+      "ApiKeyPatch": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "secret": { "type": "string", "minLength": 8, "writeOnly": true },
+          "enabled": { "type": "boolean" },
+          "priority": { "type": "integer", "minimum": 0 },
+          "proxyUrl": { "type": ["string", "null"], "format": "uri", "writeOnly": true },
+          "dailyTokenLimit": { "type": ["integer", "null"], "minimum": 0 },
+          "monthlyTokenLimit": { "type": ["integer", "null"], "minimum": 0 },
+          "dailyCostLimitUsd": { "type": ["number", "null"], "minimum": 0 },
+          "monthlyCostLimitUsd": { "type": ["number", "null"], "minimum": 0 }
+        },
+        "additionalProperties": false
+      },
+      "Model": {
+        "type": "object",
+        "required": ["id", "providerId", "name", "capabilities"],
+        "properties": {
+          "id": { "type": "string" },
+          "providerId": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "contextWindow": { "type": ["integer", "null"], "minimum": 1 },
+          "capabilities": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": ["chat", "code", "embedding", "vision", "function-calling"]
+            }
+          },
+          "cachedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "Conversation": {
+        "type": "object",
+        "required": ["id", "title", "archived", "pinned", "messageCount", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "projectId": { "type": ["string", "null"], "format": "uuid" },
+          "parentConversationId": { "type": ["string", "null"], "format": "uuid" },
+          "title": { "type": "string" },
+          "archived": { "type": "boolean" },
+          "pinned": { "type": "boolean" },
+          "messageCount": { "type": "integer", "minimum": 0 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "ConversationInput": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "projectId": { "type": "string", "format": "uuid" },
+          "workspacePath": { "type": "string", "maxLength": 4096 }
+        },
+        "additionalProperties": false
+      },
+      "ConversationPatch": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "archived": { "type": "boolean" },
+          "pinned": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "Message": {
+        "type": "object",
+        "required": ["id", "role", "content", "createdAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "role": { "type": "string", "enum": ["system", "user", "assistant", "tool"] },
+          "content": { "type": "string" },
+          "model": { "type": ["string", "null"] },
+          "inputTokens": { "type": ["integer", "null"], "minimum": 0 },
+          "outputTokens": { "type": ["integer", "null"], "minimum": 0 },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "ConversationDetail": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Conversation" },
+          {
+            "type": "object",
+            "required": ["messages"],
+            "properties": {
+              "messages": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Message" }
+              }
+            }
+          }
+        ]
+      },
+      "Snapshot": {
+        "type": "object",
+        "required": ["id", "conversationId", "messageCount", "createdAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "conversationId": { "type": "string", "format": "uuid" },
+          "messageCount": { "type": "integer", "minimum": 0 },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      },
+      "ChatRequest": {
+        "type": "object",
+        "required": ["conversationId", "model", "messages"],
+        "properties": {
+          "conversationId": { "type": "string", "format": "uuid" },
+          "model": { "type": "string" },
+          "stream": { "type": "boolean", "const": true, "default": true },
+          "messages": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["role", "content"],
+              "properties": {
+                "role": { "type": "string", "enum": ["system", "user", "assistant", "tool"] },
+                "content": { "type": "string" },
+                "name": { "type": "string" },
+                "toolCallId": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "temperature": { "type": "number", "minimum": 0, "maximum": 2 },
+          "maxTokens": { "type": "integer", "minimum": 1 },
+          "skill": { "type": "string" },
+          "tools": { "type": "array", "items": { "type": "object" } }
+        },
+        "additionalProperties": false
+      },
+      "Settings": {
+        "type": "object",
+        "required": ["locale", "theme", "maxConcurrentRequests", "keySelectionStrategy"],
+        "properties": {
+          "locale": { "type": "string", "enum": ["zh-CN", "en-US"] },
+          "theme": { "type": "string" },
+          "maxConcurrentRequests": { "type": "integer", "minimum": 1, "maximum": 32 },
+          "keySelectionStrategy": { "type": "string", "enum": ["round-robin", "priority"] },
+          "dailyCostAlertUsd": { "type": ["number", "null"], "minimum": 0 },
+          "defaultModels": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettingsPatch": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "locale": { "type": "string", "enum": ["zh-CN", "en-US"] },
+          "theme": { "type": "string" },
+          "maxConcurrentRequests": { "type": "integer", "minimum": 1, "maximum": 32 },
+          "keySelectionStrategy": { "type": "string", "enum": ["round-robin", "priority"] },
+          "dailyCostAlertUsd": { "type": ["number", "null"], "minimum": 0 },
+          "defaultModels": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UsageRecord": {
+        "type": "object",
+        "required": [
+          "id",
+          "timestamp",
+          "model",
+          "inputTokens",
+          "outputTokens",
+          "totalTokens",
+          "estimatedCostUsd",
+          "durationMs",
+          "cacheHit"
+        ],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "model": { "type": "string" },
+          "projectId": { "type": ["string", "null"], "format": "uuid" },
+          "userId": { "type": ["string", "null"], "format": "uuid" },
+          "inputTokens": { "type": "integer", "minimum": 0 },
+          "outputTokens": { "type": "integer", "minimum": 0 },
+          "totalTokens": { "type": "integer", "minimum": 0 },
+          "estimatedCostUsd": { "type": "number", "minimum": 0 },
+          "durationMs": { "type": "integer", "minimum": 0 },
+          "cacheHit": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "UsageSummary": {
+        "type": "object",
+        "required": ["inputTokens", "outputTokens", "totalTokens", "estimatedCostUsd", "groups"],
+        "properties": {
+          "inputTokens": { "type": "integer", "minimum": 0 },
+          "outputTokens": { "type": "integer", "minimum": 0 },
+          "totalTokens": { "type": "integer", "minimum": 0 },
+          "estimatedCostUsd": { "type": "number", "minimum": 0 },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["key", "totalTokens", "estimatedCostUsd"],
+              "properties": {
+                "key": { "type": "string" },
+                "totalTokens": { "type": "integer", "minimum": 0 },
+                "estimatedCostUsd": { "type": "number", "minimum": 0 }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

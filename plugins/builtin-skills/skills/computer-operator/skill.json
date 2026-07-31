@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.computer-operator",
+  "command": "@computer-operator",
+  "name": {
+    "zh-CN": "电脑操作",
+    "en-US": "Computer Operator"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "使用可用电脑控制工具观察并操作桌面应用，逐步验证界面状态，并在提交、删除、购买或权限变更前确认。",
+    "en-US": "Use available computer-control tools to observe and operate desktop applications, verify UI state step by step, and confirm before submission, deletion, purchase, or permission changes."
+  },
+  "prompts": {
+    "zh-CN": "prompts/computer-operator.zh-CN.md",
+    "en-US": "prompts/computer-operator.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.computer-operator"
+  },
+  "variables": [
+    {
+      "name": "request",
+      "description": "需要在电脑上完成的具体目标",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "appName",
+      "description": "目标桌面应用或窗口",
+      "required": false,
+      "maximumLength": 256
+    },
+    {
+      "name": "constraints",
+      "description": "允许范围、禁止动作、账户或环境约束",
+      "required": false,
+      "maximumLength": 100000
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 300000
+}

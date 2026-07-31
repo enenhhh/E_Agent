@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.deploy",
+  "command": "@deploy",
+  "name": {
+    "zh-CN": "部署生成",
+    "en-US": "Deployment Generator"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "根据项目技术栈生成 Dockerfile、docker-compose 和 Kubernetes 生产部署配置。",
+    "en-US": "Generate production Dockerfile, docker-compose, and Kubernetes deployment configuration from project context."
+  },
+  "prompts": {
+    "zh-CN": "prompts/deploy.zh-CN.md",
+    "en-US": "prompts/deploy.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.deploy"
+  },
+  "variables": [
+    {
+      "name": "projectContext",
+      "description": "项目目录、依赖、构建命令、启动命令和监听端口",
+      "required": true,
+      "maximumLength": 500000
+    },
+    {
+      "name": "target",
+      "description": "部署目标，例如 docker、compose、kubernetes 或全部",
+      "required": false,
+      "maximumLength": 64
+    },
+    {
+      "name": "requirements",
+      "description": "域名、扩缩容、持久化、资源和安全等额外要求",
+      "required": false,
+      "maximumLength": 100000
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 180000
+}

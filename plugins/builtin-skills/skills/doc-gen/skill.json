@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.doc-gen",
+  "command": "@doc-gen",
+  "name": {
+    "zh-CN": "文档生成",
+    "en-US": "Documentation Generator"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "为函数、类或模块生成包含参数、返回值、异常、示例和注意事项的完整文档。",
+    "en-US": "Generate complete documentation for a function, class, or module, including parameters, returns, errors, examples, and caveats."
+  },
+  "prompts": {
+    "zh-CN": "prompts/doc-gen.zh-CN.md",
+    "en-US": "prompts/doc-gen.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.doc-gen"
+  },
+  "variables": [
+    {
+      "name": "code",
+      "description": "需要生成文档的完整源码",
+      "required": true,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "language",
+      "description": "编程语言",
+      "required": false,
+      "maximumLength": 64
+    },
+    {
+      "name": "filePath",
+      "description": "源码文件路径",
+      "required": false,
+      "maximumLength": 1024
+    },
+    {
+      "name": "projectContext",
+      "description": "项目技术栈、约定和相关类型",
+      "required": false,
+      "maximumLength": 100000
+    },
+    {
+      "name": "docStyle",
+      "description": "文档格式偏好，例如 JSDoc、TSDoc、docstring 或 GoDoc",
+      "required": false,
+      "maximumLength": 64
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 120000
+}

@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": false,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "useUnknownInCatchVariables": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@e-agent/ai-runtime": ["packages/ai-runtime/src/index.ts"],
+      "@e-agent/app-ui": ["packages/app-ui/src/index.ts"],
+      "@e-agent/config": ["packages/config/src/index.ts"],
+      "@e-agent/contracts": ["packages/contracts/src/index.ts"],
+      "@e-agent/core": ["packages/core/src/index.ts"],
+      "@e-agent/database": ["packages/database/src/index.ts"],
+      "@e-agent/mcp-runtime": ["packages/mcp-runtime/src/index.ts"],
+      "@e-agent/observability": ["packages/observability/src/index.ts"],
+      "@e-agent/plugin-runtime": ["packages/plugin-runtime/src/index.ts"],
+      "@e-agent/plugin-sdk": ["packages/plugin-sdk/src/index.ts"],
+      "@e-agent/security": ["packages/security/src/index.ts"],
+      "@e-agent/skills": ["packages/skills/src/index.ts"]
+    }
+  }
+}

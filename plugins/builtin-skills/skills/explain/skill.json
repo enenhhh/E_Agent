@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.explain",
+  "command": "@explain",
+  "name": {
+    "zh-CN": "代码解释",
+    "en-US": "Code Explainer"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "逐段解释代码的控制流、数据流、副作用和边界，并标注时间与空间复杂度。",
+    "en-US": "Explain code control flow, data flow, side effects, and boundaries, with time and space complexity."
+  },
+  "prompts": {
+    "zh-CN": "prompts/explain.zh-CN.md",
+    "en-US": "prompts/explain.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.explain"
+  },
+  "variables": [
+    {
+      "name": "code",
+      "description": "需要解释的完整源码",
+      "required": true,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "language",
+      "description": "编程语言",
+      "required": false,
+      "maximumLength": 64
+    },
+    {
+      "name": "filePath",
+      "description": "源码文件路径",
+      "required": false,
+      "maximumLength": 1024
+    },
+    {
+      "name": "detailLevel",
+      "description": "brief、standard 或 line-by-line",
+      "required": false,
+      "maximumLength": 32
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 120000
+}

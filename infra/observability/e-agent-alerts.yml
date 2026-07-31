@@ -1,0 +1,44 @@
+groups:
+  - name: e-agent-availability
+    rules:
+      - alert: EAgentServerDown
+        expr: up{job="e-agent-server"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: E Agent server is unavailable
+          description: Prometheus has failed to scrape E Agent for two minutes.
+      - alert: EAgentHighHttpErrorRate
+        expr: |
+          (
+            sum(rate(e_agent_http_requests_total{status=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(e_agent_http_requests_total[5m])), 1)
+          ) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: E Agent HTTP 5xx rate is above 5%
+          description: Investigate provider failures, storage latency, and recent deployments.
+      - alert: EAgentQueueSaturated
+        expr: e_agent_queue_pending > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: E Agent request queue is saturated
+          description: Queue depth has remained above 50 for five minutes.
+      - alert: EAgentHttpLatencyHigh
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(e_agent_http_request_duration_ms_bucket[5m])) by (le)
+          ) > 500
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: E Agent HTTP p95 latency is above 500 ms
+          description: Non-provider HTTP latency has exceeded the service budget for ten minutes.

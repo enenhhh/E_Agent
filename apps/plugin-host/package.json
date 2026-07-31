@@ -1,0 +1,28 @@
+{
+  "name": "@e-agent/plugin-host",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "main": "./dist/main.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@e-agent/plugin-sdk": "workspace:*",
+    "zod": "4.2.1"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.9.2",
+    "vitest": "4.1.10"
+  }
+}

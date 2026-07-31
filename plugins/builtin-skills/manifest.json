@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.builtin-skills",
+  "name": "E Agent Built-in Skills",
+  "version": "1.1.0",
+  "description": "提供故障修复、架构设计、安全重构、安全审计、浏览器研究、电脑操作及文档、测试、数据库、部署、解释等生产级内置技能。",
+  "publisher": "E Agent",
+  "entry": "dist/index.js",
+  "engines": {
+    "eAgent": ">=0.1.0",
+    "node": ">=22"
+  },
+  "types": ["tool"],
+  "permissions": {},
+  "contributes": {
+    "commands": [
+      {
+        "id": "eagent.bug-fix",
+        "title": "定位并修复故障",
+        "description": "提取故障证据、复现线索和测试上下文，为根因修复准备可验证约束。",
+        "skill": "com.eagent.bug-fix"
+      },
+      {
+        "id": "eagent.architect",
+        "title": "设计系统架构",
+        "description": "识别质量属性、集成边界和明确约束，为渐进式架构方案准备事实基础。",
+        "skill": "com.eagent.architect"
+      },
+      {
+        "id": "eagent.refactor",
+        "title": "安全重构代码",
+        "description": "分析复杂度、依赖和可变状态，在测试保护下保持行为并改善结构。",
+        "skill": "com.eagent.refactor"
+      },
+      {
+        "id": "eagent.security-audit",
+        "title": "执行安全审计",
+        "description": "保守扫描高风险模式，并要求沿信任边界和数据流逐项验证。",
+        "skill": "com.eagent.security-audit"
+      },
+      {
+        "id": "eagent.browser-research",
+        "title": "浏览器研究",
+        "description": "规范研究问题、时效和来源范围，指导模型用真实浏览器工具交叉核验并引用。",
+        "skill": "com.eagent.browser-research"
+      },
+      {
+        "id": "eagent.computer-operator",
+        "title": "操作电脑",
+        "description": "识别目标应用与高影响动作，指导模型逐步观察界面并在外部操作前确认。",
+        "skill": "com.eagent.computer-operator"
+      },
+      {
+        "id": "eagent.doc-gen",
+        "title": "生成代码文档",
+        "description": "分析函数或类的签名与结构，为模型准备可核验的文档生成上下文。",
+        "skill": "com.eagent.doc-gen"
+      },
+      {
+        "id": "eagent.test-gen",
+        "title": "生成单元测试",
+        "description": "识别语言、测试框架与测试文件位置，为模型准备测试生成计划。",
+        "skill": "com.eagent.test-gen"
+      },
+      {
+        "id": "eagent.db-helper",
+        "title": "数据库辅助",
+        "description": "识别数据库方言、操作风险和参数化要求，为模型准备数据库实现约束。",
+        "skill": "com.eagent.db-helper"
+      },
+      {
+        "id": "eagent.deploy",
+        "title": "生成部署配置",
+        "description": "识别应用运行时、端口和部署目标，为模型准备容器与 Kubernetes 配置要求。",
+        "skill": "com.eagent.deploy"
+      },
+      {
+        "id": "eagent.explain",
+        "title": "解释代码",
+        "description": "提取代码规模、分支和循环复杂度，为模型准备逐段解释上下文。",
+        "skill": "com.eagent.explain"
+      }
+    ],
+    "skills": [
+      {
+        "id": "com.eagent.bug-fix",
+        "definition": "skills/bug-fix/skill.json"
+      },
+      {
+        "id": "com.eagent.architect",
+        "definition": "skills/architect/skill.json"
+      },
+      {
+        "id": "com.eagent.refactor",
+        "definition": "skills/refactor/skill.json"
+      },
+      {
+        "id": "com.eagent.security-audit",
+        "definition": "skills/security-audit/skill.json"
+      },
+      {
+        "id": "com.eagent.browser-research",
+        "definition": "skills/browser-research/skill.json"
+      },
+      {
+        "id": "com.eagent.computer-operator",
+        "definition": "skills/computer-operator/skill.json"
+      },
+      {
+        "id": "com.eagent.doc-gen",
+        "definition": "skills/doc-gen/skill.json"
+      },
+      {
+        "id": "com.eagent.test-gen",
+        "definition": "skills/test-gen/skill.json"
+      },
+      {
+        "id": "com.eagent.db-helper",
+        "definition": "skills/db-helper/skill.json"
+      },
+      {
+        "id": "com.eagent.deploy",
+        "definition": "skills/deploy/skill.json"
+      },
+      {
+        "id": "com.eagent.explain",
+        "definition": "skills/explain/skill.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.db-helper",
+  "command": "@db-helper",
+  "name": {
+    "zh-CN": "数据库助手",
+    "en-US": "Database Helper"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "把自然语言需求转换为适配 MySQL、PostgreSQL、MongoDB 或 SQLite 的安全查询与迁移方案。",
+    "en-US": "Turn natural-language requirements into safe queries and migration plans for MySQL, PostgreSQL, MongoDB, or SQLite."
+  },
+  "prompts": {
+    "zh-CN": "prompts/db-helper.zh-CN.md",
+    "en-US": "prompts/db-helper.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.db-helper"
+  },
+  "variables": [
+    {
+      "name": "request",
+      "description": "数据库查询或变更需求",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "dialect",
+      "description": "auto、mysql、postgresql、mongodb 或 sqlite",
+      "required": false,
+      "maximumLength": 32
+    },
+    {
+      "name": "databaseSchema",
+      "description": "表、字段、索引、约束或集合结构",
+      "required": false,
+      "maximumLength": 500000
+    },
+    {
+      "name": "projectContext",
+      "description": "ORM、驱动版本、事务和性能约束",
+      "required": false,
+      "maximumLength": 100000
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 120000
+}

@@ -1,0 +1,55 @@
+:root {
+  color-scheme: dark;
+  --font-ui: Inter, 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+  --bg: #071016;
+  --bg-elevated: #0b151c;
+  --surface: #101c24;
+  --surface-raised: #14212a;
+  --surface-hover: #172630;
+  --surface-active: #1a2b35;
+  --border: #26343e;
+  --border-strong: #344550;
+  --text: #e6eff3;
+  --text-secondary: #a8b7c0;
+  --text-muted: #70838f;
+  --accent: #4adeaa;
+  --accent-strong: #24c991;
+  --accent-soft: rgba(74, 222, 170, 0.12);
+  --warning: #f3ad43;
+  --warning-soft: rgba(243, 173, 67, 0.11);
+  --danger: #fa5d5d;
+  --danger-soft: rgba(250, 93, 93, 0.11);
+  --info: #5b92ff;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --code-added: rgba(36, 201, 145, 0.18);
+  --code-removed: rgba(250, 93, 93, 0.17);
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --rail-width: 82px;
+  --sidebar-width: 244px;
+  --topbar-height: 56px;
+  --statusbar-height: 28px;
+  --transition-fast: 120ms ease;
+  --transition: 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

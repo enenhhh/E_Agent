@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.architect",
+  "command": "@architect",
+  "name": {
+    "zh-CN": "架构设计",
+    "en-US": "Architecture Design"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "分析现有系统与约束，设计边界、接口、数据流、故障策略和渐进迁移方案，并明确架构取舍。",
+    "en-US": "Analyze the current system and constraints, then design boundaries, interfaces, data flow, failure handling, incremental migration, and explicit trade-offs."
+  },
+  "prompts": {
+    "zh-CN": "prompts/architect.zh-CN.md",
+    "en-US": "prompts/architect.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.architect"
+  },
+  "variables": [
+    {
+      "name": "request",
+      "description": "架构目标和业务需求",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "projectContext",
+      "description": "现有架构、项目结构、技术栈和集成信息",
+      "required": false,
+      "maximumLength": 500000
+    },
+    {
+      "name": "constraints",
+      "description": "性能、安全、成本、合规、期限和兼容性约束",
+      "required": false,
+      "maximumLength": 100000
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 180000
+}

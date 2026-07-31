@@ -1,0 +1,26 @@
+[Unit]
+Description=E Agent collaboration server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=e-agent
+Group=e-agent
+WorkingDirectory=/opt/e-agent
+EnvironmentFile=/etc/e-agent/e-agent.env
+ExecStart=/usr/bin/node /opt/e-agent/apps/server/dist/main.js
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/e-agent /var/log/e-agent
+UMask=0077
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

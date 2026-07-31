@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.refactor",
+  "command": "@refactor",
+  "name": {
+    "zh-CN": "安全重构",
+    "en-US": "Safe Refactor"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "在保持行为和公共契约不变的前提下，分步降低复杂度、重复、耦合和可变状态，并用测试验证。",
+    "en-US": "Reduce complexity, duplication, coupling, and mutable state in test-protected steps while preserving behavior and public contracts."
+  },
+  "prompts": {
+    "zh-CN": "prompts/refactor.zh-CN.md",
+    "en-US": "prompts/refactor.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.refactor"
+  },
+  "variables": [
+    {
+      "name": "code",
+      "description": "需要重构的完整源码",
+      "required": true,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "request",
+      "description": "重构目标和必须保持的行为",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "projectContext",
+      "description": "调用方、测试、项目约定和依赖上下文",
+      "required": false,
+      "maximumLength": 100000
+    },
+    {
+      "name": "filePath",
+      "description": "源码文件路径",
+      "required": false,
+      "maximumLength": 1024
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 180000
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@e-agent/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --config vitest.config.ts",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@e-agent/ai-runtime": "workspace:*",
+    "@e-agent/contracts": "workspace:*",
+    "@e-agent/database": "workspace:*",
+    "@e-agent/observability": "workspace:*",
+    "@e-agent/security": "workspace:*",
+    "pdf-lib": "1.17.1"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "typescript": "5.9.2",
+    "vitest": "4.1.10"
+  }
+}

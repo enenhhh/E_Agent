@@ -1,0 +1,13 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+    patch:
+      default:
+        target: 85%
+
+ignore:
+  - 'apps/desktop/src/main.ts'
+  - 'apps/web/src/main.tsx'
+  - 'packages/**/src/index.ts'

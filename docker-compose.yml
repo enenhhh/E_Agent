@@ -1,0 +1,45 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    environment:
+      NODE_ENV: production
+      E_AGENT_HOST: 0.0.0.0
+      E_AGENT_PORT: 4318
+      E_AGENT_DATABASE_URL: /data/e-agent.db
+      E_AGENT_SESSION_SECRET: ${E_AGENT_SESSION_SECRET:?required}
+      E_AGENT_MASTER_KEY: ${E_AGENT_MASTER_KEY:?required}
+      # 已初始化的数据卷可留空；全新生产数据库必须在首次启动时注入。
+      E_AGENT_BOOTSTRAP_TOKEN: ${E_AGENT_BOOTSTRAP_TOKEN:-}
+      E_AGENT_ALLOWED_ORIGINS: ${E_AGENT_ALLOWED_ORIGINS:-http://localhost:8080}
+    volumes:
+      - e-agent-data:/data
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:4318/health/ready').then(r=>{if(!r.ok)process.exit(1)})",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_E_AGENT_API_URL: ''
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - '${E_AGENT_WEB_PORT:-8080}:8080'
+    restart: unless-stopped
+
+volumes:
+  e-agent-data:

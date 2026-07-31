@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.bug-fix",
+  "command": "@bug-fix",
+  "name": {
+    "zh-CN": "故障修复",
+    "en-US": "Bug Fix"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "复现故障、定位根因、实施最小修复并补充回归测试，适用于报错、崩溃、错误行为与性能退化。",
+    "en-US": "Reproduce failures, identify root causes, implement minimal fixes, and add regression tests for errors, crashes, incorrect behavior, and regressions."
+  },
+  "prompts": {
+    "zh-CN": "prompts/bug-fix.zh-CN.md",
+    "en-US": "prompts/bug-fix.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.bug-fix"
+  },
+  "variables": [
+    {
+      "name": "request",
+      "description": "故障现象、预期行为、复现方式与用户目标",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "code",
+      "description": "相关源码、日志或堆栈",
+      "required": false,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "projectContext",
+      "description": "项目结构、依赖与测试上下文",
+      "required": false,
+      "maximumLength": 100000
+    },
+    {
+      "name": "filePath",
+      "description": "首要故障文件路径",
+      "required": false,
+      "maximumLength": 1024
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 180000
+}

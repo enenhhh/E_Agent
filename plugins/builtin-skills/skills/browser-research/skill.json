@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.browser-research",
+  "command": "@browser-research",
+  "name": {
+    "zh-CN": "浏览器研究",
+    "en-US": "Browser Research"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "使用可用浏览器或 Web 工具检索、打开、交叉核验并引用权威来源，适用于最新资料、技术文档和竞品研究。",
+    "en-US": "Use available browser or web tools to search, open, cross-check, and cite authoritative sources for current facts, technical documentation, and competitive research."
+  },
+  "prompts": {
+    "zh-CN": "prompts/browser-research.zh-CN.md",
+    "en-US": "prompts/browser-research.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.browser-research"
+  },
+  "variables": [
+    {
+      "name": "query",
+      "description": "需要研究的问题与预期输出",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "freshness",
+      "description": "时效范围或截止日期",
+      "required": false,
+      "maximumLength": 64
+    },
+    {
+      "name": "allowedDomains",
+      "description": "允许或优先使用的域名列表",
+      "required": false,
+      "maximumLength": 10000
+    },
+    {
+      "name": "projectContext",
+      "description": "与研究相关的项目背景",
+      "required": false,
+      "maximumLength": 100000
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 180000
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.code-review",
+  "name": "E Agent Code Review",
+  "version": "1.0.0",
+  "description": "对代码或补丁执行确定性安全扫描，并生成结构化 AI 审查提示。",
+  "publisher": "E Agent",
+  "entry": "dist/index.js",
+  "engines": {
+    "eAgent": ">=0.1.0",
+    "node": ">=22"
+  },
+  "types": ["tool"],
+  "permissions": {},
+  "contributes": {
+    "commands": [
+      {
+        "id": "eagent.code-review",
+        "title": "代码审查",
+        "description": "扫描代码问题并准备 AI 深度审查",
+        "skill": "com.eagent.code-review"
+      }
+    ],
+    "skills": [
+      {
+        "id": "com.eagent.code-review",
+        "definition": "skill.json"
+      }
+    ]
+  }
+}

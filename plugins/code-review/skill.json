@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.code-review",
+  "command": "@code-review",
+  "name": {
+    "zh-CN": "代码审查",
+    "en-US": "Code Review"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "对代码或 Git Diff 执行正确性、安全性、性能和可维护性审查。",
+    "en-US": "Review code or a Git diff for correctness, security, performance and maintainability."
+  },
+  "prompts": {
+    "zh-CN": "prompts/code-review.zh-CN.md",
+    "en-US": "prompts/code-review.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.code-review",
+    "commandId": "eagent.code-review"
+  },
+  "variables": [
+    {
+      "name": "language",
+      "description": "编程语言",
+      "required": false,
+      "maximumLength": 64
+    },
+    {
+      "name": "filePath",
+      "description": "被审查文件路径",
+      "required": false,
+      "maximumLength": 1024
+    },
+    {
+      "name": "projectContext",
+      "description": "项目技术栈和约束",
+      "required": false,
+      "maximumLength": 20000
+    },
+    {
+      "name": "diff",
+      "description": "Git unified diff",
+      "required": false,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "code",
+      "description": "完整代码",
+      "required": false,
+      "maximumLength": 1000000
+    }
+  ],
+  "output": "json",
+  "timeoutMs": 120000
+}

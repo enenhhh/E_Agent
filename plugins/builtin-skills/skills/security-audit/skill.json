@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "com.eagent.security-audit",
+  "command": "@security-audit",
+  "name": {
+    "zh-CN": "安全审计",
+    "en-US": "Security Audit"
+  },
+  "version": "1.0.0",
+  "description": {
+    "zh-CN": "基于代码证据审计信任边界、输入校验、认证授权、秘密、注入、供应链和数据暴露风险，并给出最小修复。",
+    "en-US": "Audit trust boundaries, validation, authentication, authorization, secrets, injection, supply chain, and data exposure from code evidence, with minimal fixes."
+  },
+  "prompts": {
+    "zh-CN": "prompts/security-audit.zh-CN.md",
+    "en-US": "prompts/security-audit.en-US.md"
+  },
+  "executor": {
+    "pluginId": "com.eagent.builtin-skills",
+    "commandId": "eagent.security-audit"
+  },
+  "variables": [
+    {
+      "name": "code",
+      "description": "待审计的完整源码或补丁",
+      "required": true,
+      "maximumLength": 1000000
+    },
+    {
+      "name": "request",
+      "description": "审计范围、资产与威胁关注点",
+      "required": true,
+      "maximumLength": 200000
+    },
+    {
+      "name": "projectContext",
+      "description": "架构、部署、依赖和身份边界上下文",
+      "required": false,
+      "maximumLength": 100000
+    },
+    {
+      "name": "filePath",
+      "description": "源码或补丁路径",
+      "required": false,
+      "maximumLength": 1024
+    }
+  ],
+  "output": "markdown",
+  "timeoutMs": 180000
+}

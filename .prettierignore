@@ -1,0 +1,14 @@
+node_modules
+dist
+out
+coverage
+playwright-report
+test-results
+.tmp
+pnpm-lock.yaml
+*.png
+*.ico
+*.icns
+*.dmg
+*.exe
+*.AppImage

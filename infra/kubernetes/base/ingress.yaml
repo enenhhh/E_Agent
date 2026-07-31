@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: e-agent
+  namespace: e-agent
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffering: 'off'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - e-agent.example.com
+      secretName: e-agent-tls
+  rules:
+    - host: e-agent.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: e-agent-server
+                port:
+                  number: 4318
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: e-agent-server
+                port:
+                  number: 4318
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: e-agent-web
+                port:
+                  number: 80

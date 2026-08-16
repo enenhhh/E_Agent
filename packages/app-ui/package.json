@@ -16,15 +16,15 @@
   "dependencies": {
     "@e-agent/contracts": "workspace:*",
     "echarts": "6.1.0",
-    "framer-motion": "12.42.2",
-    "lucide-react": "0.468.0",
+    "framer-motion": "13.1.0",
+    "lucide-react": "1.31.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-markdown": "10.1.0",
     "react-router": "8.3.0",
     "rehype-sanitize": "6.0.0",
     "remark-gfm": "4.0.1",
-    "zustand": "5.0.14"
+    "zustand": "5.0.15"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.6.3",

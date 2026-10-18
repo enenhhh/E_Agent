@@ -26,8 +26,8 @@
     "pdf-lib": "1.17.1"
   },
   "devDependencies": {
-    "tsup": "8.5.1",
-    "typescript": "5.9.2",
-    "vitest": "4.1.10"
+    "tsup": "9.0.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
   }
 }
